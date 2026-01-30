@@ -1,0 +1,1365 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Load Exterminator</title>
+
+    <style>
+      :root {
+        --bg: #0f1115;
+        --fg: #e6e6e6;
+        --muted: #a8b0bd;
+        --line: #2a2f3a;
+        --panel: #141823;
+        --panel2: #101421;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+      }
+
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .row {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+
+      @media (max-width: 980px) {
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        background: linear-gradient(180deg, var(--panel), var(--panel2));
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 18px;
+        margin: 0 0 10px 0;
+        font-weight: 650;
+        letter-spacing: 0.2px;
+      }
+
+      h2 {
+        font-size: 14px;
+        margin: 0 0 10px 0;
+        font-weight: 650;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 220px;
+        resize: vertical;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: #0b0d12;
+        color: var(--fg);
+        padding: 10px;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      input,
+      select,
+      button {
+        font: inherit;
+      }
+
+      button {
+        border: 1px solid var(--line);
+        background: #0b0d12;
+        color: var(--fg);
+        border-radius: 12px;
+        padding: 10px 12px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        border-color: #3b4456;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btns {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .small {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .stat {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #0b0d12;
+      }
+
+      .stat b {
+        font-weight: 700;
+      }
+
+      .gaugeWrap {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        background: #0b0d12;
+        position: relative;
+      }
+
+      .gaugeFill {
+        height: 18px;
+        width: 100%;
+        background: linear-gradient(90deg, #f2f2f2, #aeb7c7);
+        transition: width 300ms ease;
+      }
+
+      .gaugeLabel {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #0b0d12;
+        font-weight: 700;
+        mix-blend-mode: screen;
+      }
+
+      .section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .pill {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 12px;
+        color: var(--muted);
+        background: #0b0d12;
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      details {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #0b0d12;
+        padding: 10px;
+      }
+
+      summary {
+        cursor: pointer;
+        color: var(--muted);
+        font-weight: 650;
+      }
+
+      .task {
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #0b0d12;
+        display: grid;
+        gap: 8px;
+      }
+
+      .taskTop {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .taskName {
+        font-weight: 650;
+      }
+
+      .taskMeta {
+        color: var(--muted);
+        font-size: 12px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .taskBtns {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .strike {
+        text-decoration: line-through;
+        opacity: 0.6;
+      }
+
+      .suggestBox {
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        padding: 10px;
+        background: #0b0d12;
+      }
+
+      .suggestTitle {
+        font-size: 12px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin: 0 0 6px 0;
+      }
+
+      .suggestMain {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .kbd {
+        font-size: 12px;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: #0f1115;
+      }
+
+      .hr {
+        height: 1px;
+        background: var(--line);
+        margin: 10px 0;
+      }
+
+      .noteArea {
+        width: 100%;
+        min-height: 64px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: #0f1115;
+        color: var(--fg);
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      .attachRow {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .thumbs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .thumb {
+        width: 56px;
+        height: 56px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+        background: #0f1115;
+      }
+
+      .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        background: #0b0d12;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 12px;
+        color: var(--fg);
+        font-size: 13px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 150ms ease, transform 150ms ease;
+        max-width: min(900px, calc(100vw - 24px));
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        white-space: pre-wrap;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-6px);
+      }
+
+      canvas#fx {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      /* utilitaires (pour éviter les styles inline) */
+      .mt-10 {
+        margin-top: 10px;
+      }
+      .mt-12 {
+        margin-top: 12px;
+      }
+      .select {
+        background: #0b0d12;
+        color: var(--fg);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 8px;
+      }
+      .btn-compact {
+        padding: 6px 10px;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="fx" aria-hidden="true"></canvas>
+
+    <div class="wrap">
+      <div class="card">
+        <h1>The Load Exterminator</h1>
+
+        <div class="section">
+          <div class="pill">Principe: charge finie, tout décroît, rien ne s’ajoute.</div>
+          <div class="pill">Données: localStorage (local). Pas de compte.</div>
+        </div>
+
+        <div class="grid2 mt-10">
+          <div class="stat"><span>Points restants</span><b id="ptsLeft">0</b></div>
+          <div class="stat"><span>Temps restant estimé</span><b id="timeLeft">0 min</b></div>
+        </div>
+
+        <div class="gaugeWrap mt-10" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="gaugeFill" id="gaugeFill"></div>
+          <div class="gaugeLabel" id="gaugeLabel">0%</div>
+        </div>
+
+        <div class="btns mt-12">
+          <button id="btnSuggest" type="button">Proposer une tâche (roulette)</button>
+          <button id="btnReroll" type="button" disabled>Relancer</button>
+          <button id="btnAccept" type="button" disabled>Accepter</button>
+          <button id="btnReset" type="button">Réinitialiser (vider tout)</button>
+
+          <span class="small">
+            Raccourcis:
+            <span class="kbd">R</span> roulette,
+            <span class="kbd">A</span> accepter,
+            <span class="kbd">L</span> relancer
+          </span>
+        </div>
+
+        <div class="suggestBox mt-12" aria-live="polite">
+          <div class="suggestTitle">Suggestion actuelle</div>
+
+          <div class="suggestMain">
+            <div>
+              <div id="suggestName" class="taskName muted">Aucune</div>
+              <div id="suggestMeta" class="taskMeta"></div>
+            </div>
+            <div class="taskMeta"><span id="suggestKey" class="kbd">—</span></div>
+          </div>
+
+          <div class="hr" role="separator" aria-hidden="true"></div>
+
+          <div class="small">
+            Surprise après élimination (safe): fréquence <b id="surpFreqLabel">faible</b>.
+            <button id="btnSurpriseToggle" type="button" class="btn-compact">Changer</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="card">
+          <h2>Importer une charge (texte brut)</h2>
+
+          <textarea
+            id="importText"
+            placeholder="Colle ici ta liste brute (avec ~~barrés~~). Format libre, du moment qu’il y a : nom – points – temps – catégorie."
+          ></textarea>
+
+          <div class="btns mt-10">
+            <button id="btnImport" type="button">Importer / Parser</button>
+            <button id="btnDemo" type="button">Charger un exemple</button>
+            <div class="small">
+              L’app parse les lignes de type: "- Tâche – 5 points – 30 à 50 minutes" et détecte "~~barré~~".
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Paramètres</h2>
+
+          <div class="grid2">
+            <div class="stat">
+              <span>Durée d’un fragment</span>
+              <select id="fragMinutes" class="select" aria-label="Durée d’un fragment">
+                <option value="10">10 minutes</option>
+                <option value="5">5 minutes (fatigue)</option>
+              </select>
+            </div>
+
+            <div class="stat">
+              <span>Vue par défaut</span>
+              <select id="defaultView" class="select" aria-label="Vue par défaut">
+                <option value="cat">Catégories</option>
+                <option value="pts">Poids (points)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="small mt-10">
+            Notes & photos: stockées localement. Attention: trop d’images peut saturer le stockage du navigateur.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Charge active</h2>
+
+        <div class="section">
+          <div class="small">Toutes les tâches sont déjà “là”. Tu ne fais que dissoudre ce qui reste.</div>
+          <div class="small">Affichage: <span class="kbd" id="viewLabel">Catégories</span></div>
+        </div>
+
+        <div id="taskContainer" class="list mt-10"></div>
+
+        <div class="small mt-10">
+          Conseil TDA/H: utilise surtout la roulette + fragments. Le résultat importe moins que l’acte (ex: appel tenté = fragment validé).
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      (() => {
+        /** =========================
+         *  SAFE-BY-DESIGN NOTE
+         *  Surprises are intentionally mild + adjustable.
+         *  No "addictive" variable-ratio exploitation.
+         *  ========================= */
+
+        const LS_KEY = "load_exterminator_v1";
+        const LS_PREF = "load_exterminator_prefs_v1";
+
+        const POINT_TO_TIME = {
+          1: { min: 5, max: 5 },
+          2: { min: 5, max: 10 },
+          3: { min: 10, max: 30 },
+          5: { min: 30, max: 50 },
+          8: { min: 50, max: 80 },
+          13: { min: 80, max: 120 },
+        };
+
+        const SURPRISE_LEVELS = [
+          { key: "faible", p: 0.12 },
+          { key: "moyenne", p: 0.22 },
+          { key: "rare", p: 0.06 },
+        ];
+
+        const ABSURD_LINES = [
+          "Segment dissous. Le réel recule.",
+          "Une unité de charge vient de rendre l’âme. Silence respectueux.",
+          "Le boss perd de la masse. C’est scientifiquement satisfaisant.",
+          "Ce fragment n’existera plus jamais. Comme un mauvais souvenir, mais utile.",
+          "Démantèlement validé. La montagne est un peu moins montagne.",
+          "Rien à prouver. Juste à réduire.",
+          "La charge diminue. Le cerveau respire.",
+          "Un pas de moins vers l’encombrement. C’est propre.",
+          "Extermination partielle. Poussière cosmique.",
+          "La bureaucratie tremble. À peine. Mais quand même.",
+        ];
+
+        // Writing/report preset fragments (named)
+        const FRAG_TEMPLATES = {
+          writing_report: [
+            "Rassembler les données",
+            "Dicter / rédaction brute",
+            "Transférer dans le document final",
+            "Relire et adapter",
+            "Imprimer, signer, scanner, envoyer",
+            "Envoyer au patient / destinataire final",
+          ],
+          call_2: ["Trouver / vérifier le numéro", "Appeler / tenter l’appel"],
+          sport_4: [
+            "Préparer matériel / tenue",
+            "Mouvement (bloc court)",
+            "Mouvement (bloc court)",
+            "Mouvement (bloc court)",
+          ],
+        };
+
+        /** ========= UI elements ========= */
+        const el = (id) => document.getElementById(id);
+        const ptsLeftEl = el("ptsLeft");
+        const timeLeftEl = el("timeLeft");
+        const gaugeFill = el("gaugeFill");
+        const gaugeLabel = el("gaugeLabel");
+        const taskContainer = el("taskContainer");
+        const importText = el("importText");
+        const btnImport = el("btnImport");
+        const btnDemo = el("btnDemo");
+        const btnSuggest = el("btnSuggest");
+        const btnReroll = el("btnReroll");
+        const btnAccept = el("btnAccept");
+        const btnReset = el("btnReset");
+        const suggestName = el("suggestName");
+        const suggestMeta = el("suggestMeta");
+        const suggestKey = el("suggestKey");
+        const toast = el("toast");
+        const fragMinutesSel = el("fragMinutes");
+        const defaultViewSel = el("defaultView");
+        const viewLabel = el("viewLabel");
+        const btnSurpriseToggle = el("btnSurpriseToggle");
+        const surpFreqLabel = el("surpFreqLabel");
+
+        const fxCanvas = el("fx");
+        const fx = fxCanvas.getContext("2d");
+
+        /** ========= State ========= */
+        let state = loadState();
+        let prefs = loadPrefs();
+        let currentSuggestionId = null;
+
+        function loadPrefs() {
+          try {
+            const raw = localStorage.getItem(LS_PREF);
+            if (!raw) return { fragMinutes: 10, defaultView: "cat", surpriseLevelIdx: 0 };
+            const p = JSON.parse(raw);
+            return {
+              fragMinutes: p.fragMinutes === 5 ? 5 : 10,
+              defaultView: p.defaultView === "pts" ? "pts" : "cat",
+              surpriseLevelIdx: Number.isFinite(p.surpriseLevelIdx)
+                ? Math.max(0, Math.min(2, p.surpriseLevelIdx))
+                : 0,
+            };
+          } catch {
+            return { fragMinutes: 10, defaultView: "cat", surpriseLevelIdx: 0 };
+          }
+        }
+
+        function savePrefs() {
+          localStorage.setItem(LS_PREF, JSON.stringify(prefs));
+        }
+
+        function loadState() {
+          try {
+            const raw = localStorage.getItem(LS_KEY);
+            if (!raw) return { tasks: [], initialTotalPoints: 0, eliminatedCount: 0 };
+            return JSON.parse(raw);
+          } catch {
+            return { tasks: [], initialTotalPoints: 0, eliminatedCount: 0 };
+          }
+        }
+
+        function saveState() {
+          localStorage.setItem(LS_KEY, JSON.stringify(state));
+        }
+
+        /** ========= Helpers ========= */
+        const uid = () => Math.random().toString(36).slice(2, 10) + "-" + Date.now().toString(36);
+
+        function clamp(n, a, b) {
+          return Math.max(a, Math.min(b, n));
+        }
+
+        function sumRemainingPoints() {
+          return state.tasks.reduce((acc, t) => acc + (t.eliminated ? 0 : t.pointsRemaining || 0), 0);
+        }
+
+        function sumRemainingTime() {
+          // crude estimate: use task timeMin/timeMax scaled by remaining points fraction
+          let min = 0;
+          let max = 0;
+          for (const t of state.tasks) {
+            if (t.eliminated) continue;
+            const frac = t.pointsTotal > 0 ? t.pointsRemaining / t.pointsTotal : 0;
+            const tmin = Math.round((t.timeMin || 0) * frac);
+            const tmax = Math.round((t.timeMax || 0) * frac);
+            min += tmin;
+            max += tmax;
+          }
+          return { min, max };
+        }
+
+        function showToast(msg) {
+          toast.textContent = msg;
+          toast.classList.add("show");
+          setTimeout(() => toast.classList.remove("show"), 1300);
+        }
+
+        function resizeFx() {
+          fxCanvas.width = window.innerWidth * devicePixelRatio;
+          fxCanvas.height = window.innerHeight * devicePixelRatio;
+          fx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+        }
+        window.addEventListener("resize", resizeFx);
+        resizeFx();
+
+        function burst(strength = 1) {
+          // abstract explosion: particles from bottom center
+          const W = window.innerWidth;
+          const H = window.innerHeight;
+          const cx = W / 2;
+          const cy = H - 140;
+          const n = Math.floor(40 * strength);
+          const particles = [];
+          for (let i = 0; i < n; i++) {
+            const ang = -Math.PI / 2 + (Math.random() - 0.5) * 1.2;
+            const spd = (2 + Math.random() * 5) * strength;
+            particles.push({
+              x: cx,
+              y: cy,
+              vx: Math.cos(ang) * spd,
+              vy: Math.sin(ang) * spd,
+              life: 35 + Math.random() * 20,
+              r: 1 + Math.random() * 2 * strength,
+            });
+          }
+          let frame = 0;
+          const tick = () => {
+            frame++;
+            fx.clearRect(0, 0, W, H);
+            fx.globalAlpha = 1;
+            fx.fillStyle = "rgba(230,230,230,0.85)";
+            for (const p of particles) {
+              p.x += p.vx;
+              p.y += p.vy;
+              p.vy += 0.12; // gravity
+              p.life -= 1;
+              fx.globalAlpha = Math.max(0, p.life / 60);
+              fx.beginPath();
+              fx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+              fx.fill();
+            }
+            if (frame < 55) requestAnimationFrame(tick);
+            else fx.clearRect(0, 0, W, H);
+          };
+          requestAnimationFrame(tick);
+        }
+
+        function pick(arr) {
+          return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function maybeSurprise() {
+          const lvl = SURPRISE_LEVELS[prefs.surpriseLevelIdx] || SURPRISE_LEVELS[0];
+          if (Math.random() < lvl.p) {
+            const r = Math.random();
+            if (r < 0.45) {
+              burst(1.8);
+              showToast(pick(ABSURD_LINES));
+            } else if (r < 0.8) {
+              burst(1.2);
+              showToast(pick(ABSURD_LINES));
+            } else {
+              showToast(pick(ABSURD_LINES));
+            }
+          }
+        }
+
+        function updateSurpriseLabel() {
+          surpFreqLabel.textContent = (SURPRISE_LEVELS[prefs.surpriseLevelIdx] || SURPRISE_LEVELS[0]).key;
+        }
+
+        function setViewLabel() {
+          viewLabel.textContent = prefs.defaultView === "pts" ? "Poids" : "Catégories";
+        }
+
+        /** ========= Parsing ========= */
+        function stripDecor(s) {
+          return s.replace(/:+$/, "").replace(/\s{2,}/g, " ").trim();
+        }
+
+        function parsePastedText(raw) {
+          const lines = raw
+            .split(/\r?\n/)
+            .map((l) => l.trim())
+            .filter(Boolean);
+
+          const tasks = [];
+          let currentCategory = "Sans catégorie";
+
+          for (const line of lines) {
+            // Category detection: uppercase section titles or lines without dash but with colon
+            if (
+              !line.startsWith("-") &&
+              !line.startsWith("•") &&
+              !line.startsWith("*") &&
+              !line.includes(" points")
+            ) {
+              if (line.length <= 40) {
+                currentCategory = stripDecor(line);
+                continue;
+              }
+            }
+
+            const isBullet = line.startsWith("-") || line.startsWith("•") || line.startsWith("*");
+            const rawTask = isBullet ? line.replace(/^[-•*]\s*/, "") : line;
+
+            const struck = rawTask.includes("~~");
+            const clean = rawTask.replace(/~~/g, "").trim();
+
+            const ptsMatch = clean.match(/(\d+)\s*points?/i);
+            if (!ptsMatch) continue;
+            const points = Number(ptsMatch[1]);
+
+            let timeMin = POINT_TO_TIME[points]?.min ?? 5;
+            let timeMax = POINT_TO_TIME[points]?.max ?? 10;
+
+            const timeMatch = clean.match(/(\d+)\s*(?:à|-)\s*(\d+)\s*minutes/i);
+            const timeSingle = clean.match(/(\d+)\s*minutes/i);
+            if (timeMatch) {
+              timeMin = Number(timeMatch[1]);
+              timeMax = Number(timeMatch[2]);
+            } else if (timeSingle) {
+              const v = Number(timeSingle[1]);
+              timeMin = v;
+              timeMax = v;
+            }
+
+            // name: take part before first " – " or "-"
+            const name = clean.split("–")[0].split("-")[0].trim();
+
+            const task = makeTask({
+              name,
+              category: currentCategory,
+              pointsTotal: points,
+              timeMin,
+              timeMax,
+              eliminated: struck,
+            });
+
+            tasks.push(task);
+          }
+
+          return tasks;
+        }
+
+        /** ========= Task creation & default fragmentation ========= */
+        function makeTask({ name, category, pointsTotal, timeMin, timeMax, eliminated }) {
+          const id = uid();
+          const pointsRemaining = eliminated ? 0 : pointsTotal;
+
+          const lname = name.toLowerCase();
+          const lcat = (category || "").toLowerCase();
+
+          let fragMode = "anonymous";
+          let fragLabels = [];
+          let fragTotal = pointsTotal;
+          let fragRemaining = eliminated ? 0 : pointsTotal;
+
+          const isWriting =
+            /rapport|note|rédaction|lettre|dossier|comp(l|)éter|smart phrase|smartphrase|consultation/i.test(lname) ||
+            /rapports|notes|rédaction/i.test(lcat);
+
+          const isCall = /appeler|contacter|téléphone|tel|call/i.test(lname) || /appels/i.test(lcat);
+
+          const isSport = /sport|mouvement|gym|course/i.test(lname) || /sport/i.test(lcat);
+
+          if (isWriting) {
+            fragMode = "named";
+            fragLabels = FRAG_TEMPLATES.writing_report.slice();
+            fragTotal = fragLabels.length;
+            fragRemaining = eliminated ? 0 : fragTotal;
+          } else if (isCall) {
+            fragMode = "named";
+            fragLabels = FRAG_TEMPLATES.call_2.slice();
+            fragTotal = fragLabels.length;
+            fragRemaining = eliminated ? 0 : fragTotal;
+          } else if (isSport) {
+            fragMode = "named";
+            fragLabels = FRAG_TEMPLATES.sport_4.slice();
+            fragTotal = fragLabels.length;
+            fragRemaining = eliminated ? 0 : fragTotal;
+          } else {
+            fragMode = "anonymous";
+            fragLabels = [];
+            fragTotal = eliminated ? 0 : pointsTotal;
+            fragRemaining = eliminated ? 0 : pointsTotal;
+          }
+
+          return {
+            id,
+            name,
+            category,
+            pointsTotal,
+            pointsRemaining,
+            timeMin,
+            timeMax,
+            eliminated: !!eliminated,
+
+            fragMode,
+            fragTotal,
+            fragRemaining,
+            fragLabels,
+
+            fragNotes: {},
+            fragPhotos: {},
+          };
+        }
+
+        function rescalePointsOnFragment(t) {
+          if (t.eliminated) return;
+
+          const fragTotal = Math.max(1, t.fragTotal || 1);
+          const pointsPerFrag = t.pointsTotal / fragTotal;
+          const next = Math.max(0, t.pointsRemaining - pointsPerFrag);
+          t.pointsRemaining = Math.round(next * 10) / 10;
+
+          if (t.pointsRemaining <= 0.001) {
+            t.pointsRemaining = 0;
+            t.eliminated = true;
+            state.eliminatedCount = (state.eliminatedCount || 0) + 1;
+            maybeSurprise();
+            burst(1.0);
+          }
+        }
+
+        /** ========= Roulette (weighted by remaining points) ========= */
+        function pickWeightedTask() {
+          const active = state.tasks.filter((t) => !t.eliminated && (t.pointsRemaining || 0) > 0);
+          if (active.length === 0) return null;
+
+          const weights = active.map((t) => Math.max(1, Math.ceil(t.pointsRemaining)));
+          const total = weights.reduce((a, b) => a + b, 0);
+
+          let r = Math.random() * total;
+          for (let i = 0; i < active.length; i++) {
+            r -= weights[i];
+            if (r <= 0) return active[i];
+          }
+          return active[active.length - 1];
+        }
+
+        /** ========= Rendering ========= */
+        function formatPoints(n) {
+          if (Math.abs(n - Math.round(n)) < 0.001) return String(Math.round(n));
+          return n.toFixed(1);
+        }
+
+        function getFragLabel(t, fragIdx) {
+          if (t.fragMode === "named" && Array.isArray(t.fragLabels) && t.fragLabels.length) {
+            const pos = fragIdx - 1;
+            return t.fragLabels[pos] || `Fragment ${fragIdx}`;
+          }
+          return `Fragment ${fragIdx}`;
+        }
+
+        async function fileToDataURL(file, maxW = 900) {
+          const dataUrl = await new Promise((res, rej) => {
+            const r = new FileReader();
+            r.onload = () => res(r.result);
+            r.onerror = rej;
+            r.readAsDataURL(file);
+          });
+
+          const img = await new Promise((res, rej) => {
+            const im = new Image();
+            im.onload = () => res(im);
+            im.onerror = rej;
+            im.src = dataUrl;
+          });
+
+          const scale = Math.min(1, maxW / img.width);
+          const w = Math.round(img.width * scale);
+          const h = Math.round(img.height * scale);
+
+          const c = document.createElement("canvas");
+          c.width = w;
+          c.height = h;
+          const ctx = c.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          return c.toDataURL("image/jpeg", 0.82);
+        }
+
+        function renderTask(t) {
+          const wrap = document.createElement("div");
+          wrap.className = "task";
+
+          const top = document.createElement("div");
+          top.className = "taskTop";
+
+          const left = document.createElement("div");
+          const name = document.createElement("div");
+          name.className = "taskName" + (t.eliminated ? " strike" : "");
+          name.textContent = t.name;
+
+          const meta = document.createElement("div");
+          meta.className = "taskMeta";
+          const parts = [
+            `catégorie: ${t.category || "—"}`,
+            `poids: ${t.pointsTotal} pts`,
+            `reste: ${formatPoints(t.pointsRemaining)} pts`,
+            `temps: ${t.timeMin}–${t.timeMax} min`,
+            `fragments restants: ${t.fragRemaining}`,
+          ];
+          for (const p of parts) {
+            const s = document.createElement("span");
+            s.textContent = p;
+            meta.appendChild(s);
+          }
+
+          left.appendChild(name);
+          left.appendChild(meta);
+
+          const right = document.createElement("div");
+          right.className = "taskBtns";
+
+          const btnFrag = document.createElement("button");
+          btnFrag.textContent = "Consommer 1 fragment";
+          btnFrag.disabled = t.eliminated || t.fragRemaining <= 0;
+          btnFrag.addEventListener("click", () => consumeFragment(t.id));
+
+          const btnElim = document.createElement("button");
+          btnElim.textContent = "Éliminer d’un coup";
+          btnElim.disabled = t.eliminated;
+          btnElim.addEventListener("click", () => eliminateTask(t.id));
+
+          const btnTune = document.createElement("button");
+          btnTune.textContent = "Fragments";
+          btnTune.disabled = t.eliminated;
+          btnTune.addEventListener("click", () => tuneFragments(t.id));
+
+          right.appendChild(btnFrag);
+          right.appendChild(btnElim);
+          right.appendChild(btnTune);
+
+          top.appendChild(left);
+          top.appendChild(right);
+
+          wrap.appendChild(top);
+
+          if (!t.eliminated && t.fragRemaining > 0) {
+            const fragIdx = t.fragRemaining;
+            const fragLabel = getFragLabel(t, fragIdx);
+
+            const fragBox = document.createElement("div");
+            fragBox.style.display = "grid";
+            fragBox.style.gap = "8px";
+
+            const fragLine = document.createElement("div");
+            fragLine.className = "small";
+            fragLine.textContent = `Fragment restant: ${fragIdx} — ${fragLabel} — durée: ${prefs.fragMinutes} min`;
+
+            const note = document.createElement("textarea");
+            note.className = "noteArea";
+            note.placeholder = "Note (optionnelle) pour ce fragment…";
+            note.value = t.fragNotes && t.fragNotes[String(fragIdx)] ? t.fragNotes[String(fragIdx)] : "";
+            note.addEventListener("change", () => {
+              const task = state.tasks.find((x) => x.id === t.id);
+              if (!task) return;
+              task.fragNotes = task.fragNotes || {};
+              task.fragNotes[String(fragIdx)] = note.value.slice(0, 6000);
+              saveState();
+              showToast("Note sauvegardée.");
+            });
+
+            const attach = document.createElement("div");
+            attach.className = "attachRow";
+
+            const file = document.createElement("input");
+            file.type = "file";
+            file.accept = "image/*";
+            file.addEventListener("change", async () => {
+              if (!file.files || !file.files[0]) return;
+              const img64 = await fileToDataURL(file.files[0], 900);
+              const task = state.tasks.find((x) => x.id === t.id);
+              task.fragPhotos = task.fragPhotos || {};
+              const key = String(fragIdx);
+              task.fragPhotos[key] = task.fragPhotos[key] || [];
+              task.fragPhotos[key].push(img64);
+              task.fragPhotos[key] = task.fragPhotos[key].slice(-4);
+              saveState();
+              file.value = "";
+              showToast("Photo attachée.");
+              render();
+            });
+
+            const thumbs = document.createElement("div");
+            thumbs.className = "thumbs";
+            const photos = t.fragPhotos && t.fragPhotos[String(fragIdx)] ? t.fragPhotos[String(fragIdx)] : [];
+            for (let i = 0; i < photos.length; i++) {
+              const th = document.createElement("div");
+              th.className = "thumb";
+              const im = document.createElement("img");
+              im.src = photos[i];
+              im.title = "Cliquer pour supprimer";
+              im.addEventListener("click", () => {
+                const task = state.tasks.find((x) => x.id === t.id);
+                const key = String(fragIdx);
+                task.fragPhotos[key].splice(i, 1);
+                saveState();
+                render();
+              });
+              th.appendChild(im);
+              thumbs.appendChild(th);
+            }
+
+            attach.appendChild(file);
+            const hint = document.createElement("span");
+            hint.className = "small";
+            hint.textContent = "Ajouter photo (ex: numéro, doc). Cliquer une miniature pour supprimer.";
+            attach.appendChild(hint);
+
+            fragBox.appendChild(fragLine);
+            fragBox.appendChild(note);
+            fragBox.appendChild(attach);
+            if (photos.length) fragBox.appendChild(thumbs);
+
+            wrap.appendChild(fragBox);
+          } else if (t.eliminated) {
+            const doneLine = document.createElement("div");
+            doneLine.className = "small";
+            doneLine.textContent = "Éliminée.";
+            wrap.appendChild(doneLine);
+          }
+
+          return wrap;
+        }
+
+        function makeDetails(title, items) {
+          const det = document.createElement("details");
+          det.open = false;
+
+          const sum = items.reduce((a, t) => a + (t.eliminated ? 0 : Math.max(0, t.pointsRemaining || 0)), 0);
+          const done = items.filter((t) => t.eliminated).length;
+          const total = items.length;
+
+          const sumEl = document.createElement("summary");
+          sumEl.textContent = `${title} — reste ${formatPoints(sum)} pts — ${done}/${total} éliminées`;
+          det.appendChild(sumEl);
+
+          const box = document.createElement("div");
+          box.className = "list mt-10";
+
+          items.sort((a, b) => Number(a.eliminated) - Number(b.eliminated));
+
+          for (const t of items) box.appendChild(renderTask(t));
+          det.appendChild(box);
+          return det;
+        }
+
+        function render() {
+          fragMinutesSel.value = String(prefs.fragMinutes);
+          defaultViewSel.value = prefs.defaultView;
+          updateSurpriseLabel();
+          setViewLabel();
+
+          const remPts = sumRemainingPoints();
+          ptsLeftEl.textContent = formatPoints(remPts);
+
+          const remTime = sumRemainingTime();
+          timeLeftEl.textContent = `${remTime.min}–${remTime.max} min`;
+
+          const init = Math.max(1, state.initialTotalPoints || remPts || 1);
+          const pct = clamp(Math.round((remPts / init) * 100), 0, 100);
+          gaugeFill.style.width = `${pct}%`;
+          gaugeLabel.textContent = `${pct}%`;
+
+          const sug = currentSuggestionId ? state.tasks.find((t) => t.id === currentSuggestionId) : null;
+          if (sug && !sug.eliminated) {
+            suggestName.textContent = sug.name;
+            suggestName.classList.remove("muted");
+            suggestMeta.innerHTML = "";
+            const meta = [
+              `catégorie: ${sug.category || "—"}`,
+              `reste: ${formatPoints(sug.pointsRemaining)} pts`,
+              `temps: ${sug.timeMin}–${sug.timeMax} min`,
+              `fragments restants: ${sug.fragRemaining}`,
+            ];
+            meta.forEach((m) => {
+              const s = document.createElement("span");
+              s.textContent = m;
+              suggestMeta.appendChild(s);
+            });
+            suggestKey.textContent = sug.id.slice(0, 6);
+            btnAccept.disabled = false;
+            btnReroll.disabled = false;
+          } else {
+            suggestName.textContent = "Aucune";
+            suggestName.classList.add("muted");
+            suggestMeta.innerHTML = "";
+            suggestKey.textContent = "—";
+            btnAccept.disabled = true;
+            btnReroll.disabled = true;
+            currentSuggestionId = null;
+          }
+
+          taskContainer.innerHTML = "";
+          const tasks = state.tasks.slice();
+
+          if (prefs.defaultView === "pts") {
+            const groups = new Map();
+            for (const t of tasks) {
+              const k = String(t.pointsTotal);
+              if (!groups.has(k)) groups.set(k, []);
+              groups.get(k).push(t);
+            }
+            const keys = [...groups.keys()].map(Number).sort((a, b) => b - a);
+            for (const k of keys) {
+              const list = groups.get(String(k));
+              taskContainer.appendChild(makeDetails(`Poids ${k} points`, list));
+            }
+          } else {
+            const groups = new Map();
+            for (const t of tasks) {
+              const k = t.category || "Sans catégorie";
+              if (!groups.has(k)) groups.set(k, []);
+              groups.get(k).push(t);
+            }
+            const keys = [...groups.keys()].sort((a, b) => a.localeCompare(b, "fr"));
+            for (const k of keys) {
+              const list = groups.get(k);
+              taskContainer.appendChild(makeDetails(k, list));
+            }
+          }
+
+          saveState();
+          savePrefs();
+        }
+
+        /** ========= Actions ========= */
+        function importTasks() {
+          const raw = importText.value.trim();
+          if (!raw) {
+            showToast("Rien à importer.");
+            return;
+          }
+          const tasks = parsePastedText(raw);
+          if (!tasks.length) {
+            showToast("Aucune tâche parsée. Vérifie le format (points).");
+            return;
+          }
+          state.tasks = tasks;
+          state.eliminatedCount = tasks.filter((t) => t.eliminated).length;
+          state.initialTotalPoints = tasks.reduce((a, t) => a + (t.eliminated ? 0 : t.pointsTotal || 0), 0);
+          currentSuggestionId = null;
+          showToast(`Importé: ${tasks.length} tâches.`);
+          render();
+        }
+
+        function eliminateTask(taskId) {
+          const t = state.tasks.find((x) => x.id === taskId);
+          if (!t || t.eliminated) return;
+          t.pointsRemaining = 0;
+          t.fragRemaining = 0;
+          t.eliminated = true;
+          state.eliminatedCount = (state.eliminatedCount || 0) + 1;
+          burst(1.4);
+          maybeSurprise();
+          showToast("Tâche éliminée.");
+          if (currentSuggestionId === taskId) currentSuggestionId = null;
+          render();
+        }
+
+        function consumeFragment(taskId) {
+          const t = state.tasks.find((x) => x.id === taskId);
+          if (!t || t.eliminated || t.fragRemaining <= 0) return;
+
+          t.fragRemaining = Math.max(0, t.fragRemaining - 1);
+
+          if (t.fragTotal > 0) {
+            rescalePointsOnFragment(t);
+          } else {
+            t.pointsRemaining = Math.max(0, (t.pointsRemaining || 0) - 1);
+            if (t.pointsRemaining <= 0) {
+              t.pointsRemaining = 0;
+              t.eliminated = true;
+              state.eliminatedCount = (state.eliminatedCount || 0) + 1;
+              burst(1.0);
+              maybeSurprise();
+            }
+          }
+
+          if (t.eliminated) showToast("Élimination confirmée.");
+          else showToast(`Fragment consommé. Reste ${t.fragRemaining}.`);
+
+          render();
+        }
+
+        function tuneFragments(taskId) {
+          const t = state.tasks.find((x) => x.id === taskId);
+          if (!t || t.eliminated) return;
+
+          const isNamed = t.fragMode === "named";
+          const msg = isNamed
+            ? "Cette tâche a une fragmentation nommée. Voulez-vous la basculer en fragments anonymes (2 à 6) ?\nTapez un nombre (2-6) ou annulez."
+            : "Choisir le nombre de fragments anonymes (2 à 6).";
+
+          const val = prompt(msg, String(clamp(t.fragTotal || 3, 2, 6)));
+          if (val === null) return;
+
+          const n = clamp(parseInt(val, 10) || 3, 2, 6);
+
+          t.fragMode = "anonymous";
+          t.fragLabels = [];
+          t.fragTotal = n;
+          t.fragRemaining = clamp(t.fragRemaining || n, 0, n);
+
+          showToast(`Fragments réglés: ${n}.`);
+          render();
+        }
+
+        function loadDemo() {
+          const demo = [
+            "APPELS / CONTACTS",
+            "- Appeler Samira – 1 point – 5 minutes",
+            "- Contacter le Dr Starkel à propos de M. Fontaine – 2 points – 5 à 10 minutes",
+            "- ~~Appeler Hugo – 1 point – 5 minutes~~",
+            "",
+            "RAPPORTS / NOTES / RÉDACTION",
+            "- Faire le rapport pour M. Melih – 8 points – 50 à 80 minutes (fragmentable)",
+            "- Compléter les notes des patients vus aux urgences – 8 points – 50 à 80 minutes",
+            "",
+            "ORGANISATION",
+            "- Déplacer le rendez-vous d’Alexandre – 1 point – 5 minutes",
+            "",
+            "PERSO",
+            "- Faire du sport – 3 points – environ 30 minutes",
+          ].join("\n");
+          importText.value = demo;
+          showToast("Exemple chargé.");
+        }
+
+        function suggest() {
+          const t = pickWeightedTask();
+          if (!t) {
+            currentSuggestionId = null;
+            showToast("Plus rien à exterminer.");
+            burst(2.2);
+            render();
+            return;
+          }
+          currentSuggestionId = t.id;
+          showToast("Tâche proposée.");
+          render();
+        }
+
+        function reroll() {
+          suggest();
+        }
+
+        function accept() {
+          const t = currentSuggestionId ? state.tasks.find((x) => x.id === currentSuggestionId) : null;
+          if (!t || t.eliminated) return;
+          consumeFragment(t.id);
+        }
+
+        function resetAll() {
+          if (!confirm("Tout effacer (local) ?")) return;
+          state = { tasks: [], initialTotalPoints: 0, eliminatedCount: 0 };
+          currentSuggestionId = null;
+          saveState();
+          showToast("Réinitialisé.");
+          render();
+        }
+
+        function toggleSurpriseLevel() {
+          prefs.surpriseLevelIdx = (prefs.surpriseLevelIdx + 1) % SURPRISE_LEVELS.length;
+          updateSurpriseLabel();
+          savePrefs();
+          render();
+        }
+
+        /** ========= Events ========= */
+        btnImport.addEventListener("click", importTasks);
+        btnDemo.addEventListener("click", loadDemo);
+        btnSuggest.addEventListener("click", suggest);
+        btnReroll.addEventListener("click", reroll);
+        btnAccept.addEventListener("click", accept);
+        btnReset.addEventListener("click", resetAll);
+        btnSurpriseToggle.addEventListener("click", toggleSurpriseLevel);
+
+        fragMinutesSel.addEventListener("change", () => {
+          prefs.fragMinutes = Number(fragMinutesSel.value) === 5 ? 5 : 10;
+          savePrefs();
+          render();
+        });
+
+        defaultViewSel.addEventListener("change", () => {
+          prefs.defaultView = defaultViewSel.value === "pts" ? "pts" : "cat";
+          savePrefs();
+          render();
+        });
+
+        window.addEventListener("keydown", (e) => {
+          if (
+            e.target &&
+            (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT" || e.target.tagName === "SELECT")
+          )
+            return;
+
+          if (e.key.toLowerCase() === "r") suggest();
+          if (e.key.toLowerCase() === "l") if (!btnReroll.disabled) reroll();
+          if (e.key.toLowerCase() === "a") if (!btnAccept.disabled) accept();
+        });
+
+        // Initial render
+        updateSurpriseLabel();
+        setViewLabel();
+        render();
+      })();
+    </script>
+  </body>
+</html>
+ 
